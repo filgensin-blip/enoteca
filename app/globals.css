@@ -1,26 +1,228 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-bg: #14100D;          /* page background: warm near-black, like walnut in shadow */
+  --color-bg-alt: #1D1713;      /* alternating sections */
+  --color-ink: #F1E8DA;         /* text: candlelit cream */
+  --color-muted: #B5A792;       /* secondary text, passes on bg and bg-alt */
+  --color-primary: #D09A45;     /* candle amber: buttons, links, focus ring */
+  --color-on-primary: #14100D;  /* text on amber buttons */
+  --color-primary-deep: #B8822F;/* button hover fill (decorative wipe) */
+  --color-accent: #7A1E24;      /* oxblood velvet: decorative fills, rules, NEVER text on bg */
+  --color-dark: #3A1418;        /* oxblood band sections (closing CTA) */
+  --color-on-dark: #F1E8DA;
+  --color-muted-on-dark: #D6C3B0;
+  --color-line: rgb(241 232 218 / 0.12);
+  --color-field: #7A6D5E;       /* input borders, passes 3:1 */
+  --color-error: #F08A7E;
+
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-manrope);
+
+  --radius-card: 2px;
+  --radius-button: 2px;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root { --header-h: 76px; color-scheme: dark; }
+@media (max-width: 767px) { :root { --header-h: 64px; } }
+html { background: var(--color-bg); color: var(--color-ink); }
+body { font-family: var(--font-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+@media (max-width: 767px) { body { font-size: 16px; } }
+::selection { background: var(--color-accent); color: var(--color-ink); }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+[id] { scroll-margin-top: calc(var(--header-h) + 24px); }
+/* On /menu the sticky jump bar sits under the header too. */
+.menu-page [id] { scroll-margin-top: calc(var(--header-h) + 88px); }
+
+/* ---------- Type ---------- */
+.font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+/* Cormorant defaults to old-style figures ("12" reads as "I2"); the numerals are an anchor, so use lining. */
+.font-display, .h-hero, .h-closing, .h-section { font-variant-numeric: lining-nums; }
+.h-hero { font-family: var(--font-display); font-weight: 500; font-size: clamp(3rem, 7vw + 1rem, 7.5rem); line-height: 0.95; letter-spacing: -0.01em; }
+.h-closing { font-family: var(--font-display); font-weight: 500; font-size: clamp(2.75rem, 5.5vw + 1rem, 6rem); line-height: 0.98; letter-spacing: -0.01em; }
+.h-section { font-family: var(--font-display); font-weight: 500; font-size: clamp(2.25rem, 3.5vw + 1rem, 4rem); line-height: 1.05; letter-spacing: -0.01em; }
+.eyebrow { display: inline-flex; align-items: center; gap: 12px; font-family: var(--font-body); font-weight: 500; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--color-primary); }
+.eyebrow::before { content: ""; width: 24px; height: 1px; background: currentColor; }
+.prose-width { max-width: 64ch; }
+.tabular { font-variant-numeric: lining-nums tabular-nums; }
+
+/* ---------- Links & buttons (base, no motion) ---------- */
+.link {
+  color: var(--color-primary);
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  padding-bottom: 2px;
+}
+.link-ink { color: var(--color-ink); }
+.link-error { color: var(--color-error); }
+.link[aria-current="page"] { background-size: 100% 1px; background-image: linear-gradient(var(--color-primary), var(--color-primary)); }
+
+.btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 26px;
+  border-radius: var(--radius-button);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-primary-deep);
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+.btn-outline { border: 1px solid var(--color-field); color: var(--color-ink); background: transparent; }
+.btn-sm { min-height: 42px; padding: 0 18px; font-size: 14px; }
+.btn[disabled] { opacity: 0.6; cursor: progress; }
+
+/* ---------- Skip link ---------- */
+.skip-link { position: absolute; left: 16px; top: -100px; z-index: 100; }
+.skip-link:focus { top: 16px; }
+
+/* ---------- Photo frame ---------- */
+.frame-inset::after { content: ""; position: absolute; inset: 12px; border: 1px solid rgb(241 232 218 / 0.28); pointer-events: none; z-index: 1; }
+.photo-img { transition: none; }
+
+/* ---------- Film grain (static, decorative) ---------- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------- Menu ---------- */
+.menu-leader { border-bottom: 1px dotted rgb(241 232 218 / 0.4); transform: translateY(-5px); }
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Two columns + hover preview only with a mouse on desktop; thumbnails everywhere else. */
+.menu-preview { display: none; }
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .menu-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 2.5rem; }
+  .menu-list { grid-column: span 7 / span 7; }
+  .menu-preview { display: block; grid-column: 8 / span 5; }
+  .menu-thumb { display: none; }
+}
+@media (min-width: 768px) and (not ((hover: hover) and (pointer: fine))) {
+  .menu-list { max-width: 820px; }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------- FAQ ---------- */
+.faq summary { list-style: none; cursor: pointer; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq .faq-marker { position: relative; width: 14px; height: 14px; flex: none; }
+.faq .faq-marker::before, .faq .faq-marker::after { content: ""; position: absolute; left: 0; top: 50%; width: 14px; height: 1px; background: var(--color-primary); }
+.faq .faq-marker::after { transform: rotate(90deg); }
+.faq details[open] .faq-marker::after { transform: rotate(0deg); }
+
+/* ---------- Reveal (JS only; content never stays hidden without JS) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal]:not(.is-in) { opacity: 0; transform: translateY(16px); }
+}
+
+/* ---------- Form ---------- */
+.field {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  font-size: 16px;
+  color: var(--color-ink);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-field);
+  border-radius: 2px;
+}
+.field:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; border-color: var(--color-primary); }
+.field[aria-invalid="true"] { border-color: var(--color-error); }
+.field:disabled { opacity: 0.6; }
+select.field {
+  appearance: none;
+  padding-right: 40px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-primary) 50%), linear-gradient(135deg, var(--color-primary) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+input[type="date"].field::-webkit-calendar-picker-indicator { filter: invert(0.8) sepia(0.4); cursor: pointer; }
+
+/* =====================================================================
+   MOTION — level 2 (Smooth). Everything that moves lives below.
+   Reduced motion: nothing here applies, the site is fully still.
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] { transition: opacity 700ms var(--ease-out-soft), transform 700ms var(--ease-out-soft); transition-delay: var(--reveal-delay, 0ms); }
+  .header-shell { transition: background-color 250ms ease, border-color 250ms ease; }
+  .faq details::details-content { transition: height 300ms var(--ease-out-soft), content-visibility 300ms allow-discrete; height: 0; overflow: clip; }
+  .faq details[open]::details-content { height: auto; }
+  .faq .faq-marker::after { transition: transform 300ms var(--ease-out-soft); }
+  .preview-img { transition: opacity 200ms ease; }
+}
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+}
+
+/* Hover set: pointer devices only, never under reduced motion. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  /* Photos (non-background): slow zoom + a touch of light */
+  .photo-img { transition: transform 900ms var(--ease-out-soft), filter 900ms var(--ease-out-soft); }
+  .photo-zoom:hover .photo-img, .group:hover .photo-zoom .photo-img, .group:focus-visible .photo-zoom .photo-img { transform: scale(1.04); filter: brightness(1.03); }
+
+  /* Amber buttons: deeper amber rises like wine filling a glass */
+  .btn-primary::before { transition: transform 450ms var(--ease-out-soft); }
+  .btn-primary:hover::before, .btn-primary:focus-visible::before { transform: scaleY(1); }
+
+  /* Outline buttons */
+  .btn-outline { transition: background-color 300ms ease, border-color 300ms ease; }
+  .btn-outline:hover, .btn-outline:focus-visible { background: rgb(241 232 218 / 0.08); border-color: var(--color-primary); }
+
+  /* Text + nav links: underline draws in from the left, exits right. The one underline rule. */
+  .link { transition: background-size 400ms var(--ease-out-soft); background-position: 100% 100%; }
+  .link:hover, .link:focus-visible { background-size: 100% 1px; background-position: 0 100%; }
+
+  /* Signature cards */
+  .sig-title { background-image: linear-gradient(var(--color-primary), var(--color-primary)); background-repeat: no-repeat; background-position: 100% 100%; background-size: 0% 1px; transition: background-size 400ms var(--ease-out-soft); }
+  .sig-card:hover .sig-title, .sig-card:focus-visible .sig-title { background-size: 100% 1px; background-position: 0 100%; }
+  .sig-price { transition: transform 400ms var(--ease-out-soft); }
+  .sig-card:hover .sig-price, .sig-card:focus-visible .sig-price { transform: translateX(4px); }
+
+  /* Menu rows */
+  .menu-name { transition: transform 350ms var(--ease-out-soft); }
+  .menu-leader { transition: border-color 350ms ease; }
+  .menu-row:hover .menu-name, .menu-row:focus-within .menu-name { transform: translateX(6px); }
+  .menu-row:hover .menu-leader, .menu-row:focus-within .menu-leader { border-color: rgb(241 232 218 / 0.75); }
+
+  /* Hours rows */
+  .hours-day { transition: transform 350ms var(--ease-out-soft); }
+  .hours-row:hover .hours-day { transform: translateX(4px); }
+
+  /* Wordmark */
+  .wordmark-ombra { transition: letter-spacing 400ms var(--ease-out-soft); }
+  .wordmark:hover .wordmark-ombra, .wordmark:focus-visible .wordmark-ombra { letter-spacing: 0.04em; }
+
+  /* About values */
+  .value-line { transition: width 500ms var(--ease-out-soft); }
+  .value:hover .value-line { width: 64px; }
 }

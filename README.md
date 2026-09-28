@@ -10,8 +10,9 @@ Open this repo in Claude Code and send:
 
 ## Deploy it (one click)
 
-1. app.netlify.com → **Add new project** → **Import an existing project** → **GitHub** → pick this repo.
-2. Leave the detected settings (they come from `netlify.toml`) and click **Deploy**.
+1. app.netlify.com → **Add new project** → **Import an existing project** → **GitHub** → pick `filgensin-blip/enoteca`.
+2. Branch to deploy: `main` (or `claude/stoic-allen-3l9hpb` until that branch is merged). Leave the other detected settings (they come from `netlify.toml`; Netlify's Next.js runtime turns `/api/booking` into a function) and click **Deploy**.
+3. Done: the site is live on `https://<name>.netlify.app` with a working booking form.
 
 The site works right away with no environment variables. Bookings show up in Netlify under **Logs → Functions** as `[BOOKING]` lines, and guests are asked to call to confirm.
 
